@@ -1,4 +1,4 @@
-package lib
+package gomini
 
 import (
 	"bufio"

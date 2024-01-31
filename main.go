@@ -1,15 +1,27 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"bufio"
+	"log"
+	"os"
 )
 
-func main() {
-	http.Handle("/static/",
-		http.StripPrefix("/static/",
-			http.FileServer(http.Dir("assets"))))
+func user() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	err := scanner.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	text := scanner.Text()
 
-	fmt.Println("server started at localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	return text
+}
+
+func main() {
+	// id := user()
+	// name := user()
+	// age, _ := strconv.Atoi(user())
+	// grade, _ := strconv.Atoi(user())
+
 }

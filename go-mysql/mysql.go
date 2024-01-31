@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
+	"strconv"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -139,6 +143,50 @@ func sqlExec() {
 		return
 	}
 	fmt.Println("delete success!")
+}
+
+func user() string {
+	scanner := bufio.NewScanner(os.Stdin)
+	scanner.Scan()
+	err := scanner.Err()
+	if err != nil {
+		log.Fatal(err)
+	}
+	text := scanner.Text()
+
+	return text
+}
+
+func myQuery() {
+	db, err := connect()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer db.Close()
+
+	var ids, names string
+	var ages, grades int
+
+	var mixData []student
+
+	fmt.Println("Masukkan id 	: ")
+	ids = user()
+	fmt.Println("Masukkan nama  : ")
+	names = user()
+	fmt.Println("Masukkan umur  : ")
+	ages, _ = strconv.Atoi(user())
+	fmt.Println("Masukkan nilai : ")
+	grades, _ = strconv.Atoi(user())
+
+	mixData = append(mixData, student{ids, names, ages, grades})
+
+	_, err = db.Exec("insert into tb_student values (?, ?, ?, ?)", mixData[0].id, mixData[0].name, mixData[0].age, mixData[0].grade)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println("insert success!")
 }
 
 func main() {

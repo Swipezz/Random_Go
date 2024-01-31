@@ -16,4 +16,7 @@ INSERT INTO `tb_student` (`id`, `name`, `age`, `grade`) VALUES
 ALTER TABLE `tb_student` ADD PRIMARY KEY (`id`);
 
 --@block
-SELECT * FROM tb_student
+SELECT * FROM tb_student;
+
+--@block
+USE db_belajar_golang;

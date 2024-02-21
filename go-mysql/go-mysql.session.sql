@@ -19,4 +19,14 @@ ALTER TABLE `tb_student` ADD PRIMARY KEY (`id`);
 SELECT * FROM tb_student;
 
 --@block
-USE db_belajar_golang;
+DESCRIBE tb_student;
+
+--@block
+SHOW CREATE TABLE tb_student;
+
+--@block
+ALTER TABLE tb_student
+ADD PRIMARY KEY (id);
+
+--@block
+select id, name, grade, age from tb_student where age > 27

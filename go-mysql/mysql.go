@@ -1,4 +1,4 @@
-package main
+package gomysql
 
 import (
 	"bufio"
@@ -11,11 +11,11 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type student struct {
-	id    string
-	name  string
-	age   int
-	grade int
+type Student struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Age   int    `json:"age"`
+	Grade int    `json:"grade"`
 }
 
 func connect() (*sql.DB, error) {
@@ -27,7 +27,7 @@ func connect() (*sql.DB, error) {
 	return db, nil
 }
 
-func sqlQuery() {
+func SqlQuery() {
 	db, err := connect()
 	if err != nil {
 		fmt.Println(err.Error())
@@ -43,11 +43,11 @@ func sqlQuery() {
 	}
 	defer rows.Close()
 
-	var result []student
+	var result []Student
 
 	for rows.Next() {
-		var each = student{}
-		var err = rows.Scan(&each.id, &each.name, &each.grade)
+		var each = Student{}
+		var err = rows.Scan(&each.ID, &each.Name, &each.Grade)
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -63,7 +63,7 @@ func sqlQuery() {
 	}
 
 	for _, each := range result {
-		fmt.Println(each.name)
+		fmt.Println(each.Name)
 	}
 }
 
@@ -75,17 +75,17 @@ func sqlQueryRow() {
 	}
 	defer db.Close()
 
-	var result = student{}
+	var result = Student{}
 	var id = "B001"
 	err = db.
 		QueryRow("select name, grade from tb_student where id = ?", id).
-		Scan(&result.name, &result.grade)
+		Scan(&result.Name, &result.Grade)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	fmt.Printf("name: %s\ngrade: %d\n", result.name, result.grade)
+	fmt.Printf("name: %s\ngrade: %d\n", result.Name, result.Grade)
 }
 
 func sqlPrepare() {
@@ -102,17 +102,17 @@ func sqlPrepare() {
 		return
 	}
 
-	var result1 = student{}
-	stmt.QueryRow("E001").Scan(&result1.name, &result1.grade)
-	fmt.Printf("name: %s\ngrade: %d\n", result1.name, result1.grade)
+	var result1 = Student{}
+	stmt.QueryRow("E001").Scan(&result1.Name, &result1.Grade)
+	fmt.Printf("name: %s\ngrade: %d\n", result1.Name, result1.Grade)
 
-	var result2 = student{}
-	stmt.QueryRow("W001").Scan(&result2.name, &result2.grade)
-	fmt.Printf("name: %s\ngrade: %d\n", result2.name, result2.grade)
+	var result2 = Student{}
+	stmt.QueryRow("W001").Scan(&result2.Name, &result2.Grade)
+	fmt.Printf("name: %s\ngrade: %d\n", result2.Name, result2.Grade)
 
-	var result3 = student{}
-	stmt.QueryRow("B001").Scan(&result3.name, &result3.grade)
-	fmt.Printf("name: %s\ngrade: %d\n", result3.name, result3.grade)
+	var result3 = Student{}
+	stmt.QueryRow("B001").Scan(&result3.Name, &result3.Grade)
+	fmt.Printf("name: %s\ngrade: %d\n", result3.Name, result3.Grade)
 }
 
 func sqlExec() {
@@ -168,7 +168,7 @@ func myQuery() {
 	var ids, names string
 	var ages, grades int
 
-	var mixData []student
+	var mixData []Student
 
 	fmt.Println("Masukkan id 	: ")
 	ids = user()
@@ -179,9 +179,9 @@ func myQuery() {
 	fmt.Println("Masukkan nilai : ")
 	grades, _ = strconv.Atoi(user())
 
-	mixData = append(mixData, student{ids, names, ages, grades})
+	mixData = append(mixData, Student{ids, names, ages, grades})
 
-	_, err = db.Exec("insert into tb_student values (?, ?, ?, ?)", mixData[0].id, mixData[0].name, mixData[0].age, mixData[0].grade)
+	_, err = db.Exec("insert into tb_student values (?, ?, ?, ?)", mixData[0].ID, mixData[0].Name, mixData[0].Age, mixData[0].Grade)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -189,6 +189,91 @@ func myQuery() {
 	fmt.Println("insert success!")
 }
 
-func main() {
-	sqlExec()
+func Testing() []Student {
+	db, err := connect()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer db.Close()
+
+	var age = 20
+	rows, err := db.Query("select id, name, age, grade from tb_student where age > ?", age)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer rows.Close()
+
+	var result []Student
+
+	for rows.Next() {
+		var each Student
+		err := rows.Scan(&each.ID, &each.Name, &each.Age, &each.Grade)
+		if err != nil {
+		}
+
+		result = append(result, each)
+	}
+
+	return result
+}
+
+func Testing2(id string) []Student {
+	db, err := connect()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer db.Close()
+
+	rows, err := db.Query("select id, name, age, grade from tb_student where id = ?", id)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer rows.Close()
+
+	var result []Student
+
+	for rows.Next() {
+		var each Student
+		err := rows.Scan(&each.ID, &each.Name, &each.Age, &each.Grade)
+		if err != nil {
+		}
+
+		result = append(result, each)
+	}
+
+	return result
+}
+
+func Testing3(id string, name string, age int, grade int) []Student {
+	db, err := connect()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer db.Close()
+
+	_, err = db.Exec("insert into tb_student values (?, ?, ?, ?)", id, name, age, grade)
+	if err != nil {
+		fmt.Println(err.Error())
+		return nil
+	}
+	fmt.Println("insert success!")
+
+	rows, err := db.Query("select id, name, age, grade from tb_student where id = ?", id)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	defer rows.Close()
+
+	var result []Student
+
+	for rows.Next() {
+		var each Student
+		err := rows.Scan(&each.ID, &each.Name, &each.Age, &each.Grade)
+		if err != nil {
+		}
+
+		result = append(result, each)
+	}
+
+	return result
 }

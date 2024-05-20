@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	gomini.Roulette()
+	gomini.Calculator2()
 }
